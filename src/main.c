@@ -6,7 +6,7 @@
 #define DELAY_COUNT_1S  		(1000U * DELAY_COUNT_1MS)
 
 #include <inttypes.h>
-
+#include "led.h"
 
 void delay(uint32_t count);
 void led_init_all(void);

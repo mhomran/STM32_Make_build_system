@@ -5,6 +5,7 @@ SRC_DIR     := src
 
 SRCS        := $(shell find $(SRC_DIR) -name "*.c")
 OBJS        := $(SRCS:%=$(BUILD_DIR)/%.o)
+DEPS        := $(OBJS:.o=.d)
 INC_DIRS    := $(shell find $(SRC_DIR) -type d)
 INC_FLAGS   := $(addprefix -I,$(INC_DIRS))
 
@@ -12,7 +13,7 @@ TARGET      := output
 CC          := arm-none-eabi-gcc
 OBJCOPY     := arm-none-eabi-objcopy
 SIZE        := arm-none-eabi-size
-CFLAGS      := -mcpu=$(CPU) -mthumb -Wall -O0 -std=gnu99 ${INC_FLAGS}
+CFLAGS      := -mcpu=$(CPU) -mthumb -Wall -O0 -g -std=gnu99 -MMD -MP ${INC_FLAGS}
 LDFLAGS     := -mcpu=$(CPU) -mthumb -nostdlib -T $(SRC_DIR)/stm32_ls.ld -Wl,-Map=$(BUILD_DIR)/$(TARGET).map
 
 $(BUILD_DIR)/$(TARGET): $(OBJS)
@@ -23,6 +24,8 @@ $(BUILD_DIR)/$(TARGET): $(OBJS)
 $(BUILD_DIR)/%.c.o: %.c
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
+
+-include $(DEPS)
 
 .PHONY: clean
 clean:
