@@ -22,3 +22,7 @@
 
 - <code>CPU</code> determine the processor used.
 - for OpenOCD, determine the right configuration file and put it in the folder of the Makefile.
+- If you work with <strong><a href="https://xpack.github.io/qemu-arm/">xPack QEMU Arm</a></strong>, you should change the board after <code>-board</code> flag
+
+    - xPack QEMU Arm is a fork of the public open-source QEMU project, customised for more support of Cortex-M cores, and a better integration with the GNU Arm QEMU Debugging plug-in.
+    - To install xPack QEMU Arm, download the <a href="https://github.com/xpack-dev-tools/qemu-arm-xpack/releases">binaries</a> and add them to your path.

@@ -12,6 +12,7 @@ INC_FLAGS   := $(addprefix -I,$(INC_DIRS))
 TARGET      := output
 CC          := arm-none-eabi-gcc
 OBJCOPY     := arm-none-eabi-objcopy
+GDB     		:= arm-none-eabi-gdb
 SIZE        := arm-none-eabi-size
 CFLAGS      := -mcpu=$(CPU) -mthumb -Wall -O0 -g -std=gnu99 -MMD -MP ${INC_FLAGS}
 LDFLAGS     := -mcpu=$(CPU) -mthumb -nostdlib -T $(SRC_DIR)/stm32_ls.ld -Wl,-Map=$(BUILD_DIR)/$(TARGET).map
@@ -35,3 +36,10 @@ clean:
 openocd:
 	openocd -f board/stm32f4discovery.cfg 
 
+.PHONY: qemu
+qemu: 
+	qemu-system-gnuarmeclipse -s -S -board STM32F4-Discovery -image $(BUILD_DIR)/$(TARGET).elf
+
+.PHONY: gdb
+gdb: 
+	$(GDB) $(BUILD_DIR)/$(TARGET).elf
