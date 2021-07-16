@@ -1,21 +1,25 @@
-CPU         := cortex-m4
+# CONFIG
+CPU           := cortex-m4
+DEFINES       := STM32F407xx
 
-BUILD_DIR   := build
-SRC_DIR     := src
+BUILD_DIR     := build
+SRC_DIR       := src
 
-SRCS        := $(shell find $(SRC_DIR) -name "*.c")
-OBJS        := $(SRCS:%=$(BUILD_DIR)/%.o)
-DEPS        := $(OBJS:.o=.d)
-INC_DIRS    := $(shell find $(SRC_DIR) -type d)
-INC_FLAGS   := $(addprefix -I,$(INC_DIRS))
+SRCS          := $(shell find $(SRC_DIR) -name "*.c" -or -name "*.s" -or -name "*.S")
+OBJS          := $(SRCS:%=$(BUILD_DIR)/%.o)
+DEPS          := $(OBJS:.o=.d)
+LSCRIPT       := $(shell find $(SRC_DIR) -name "*.ld")
+INC_DIRS      := $(shell find $(SRC_DIR) -type d)
+INC_FLAGS     := $(addprefix -I,$(INC_DIRS))
+DEFINES_FLAGS := $(addprefix -D,$(DEFINES))
 
-TARGET      := output
-CC          := arm-none-eabi-gcc
-OBJCOPY     := arm-none-eabi-objcopy
-GDB     		:= arm-none-eabi-gdb
-SIZE        := arm-none-eabi-size
-CFLAGS      := -mcpu=$(CPU) -mthumb -Wall -O0 -g -std=gnu99 -MMD -MP ${INC_FLAGS}
-LDFLAGS     := -mcpu=$(CPU) -mthumb -nostdlib -T $(SRC_DIR)/stm32_ls.ld -Wl,-Map=$(BUILD_DIR)/$(TARGET).map
+TARGET        := output
+CC            := arm-none-eabi-gcc
+OBJCOPY       := arm-none-eabi-objcopy
+GDB           := arm-none-eabi-gdb
+SIZE          := arm-none-eabi-size
+CFLAGS        := -mcpu=$(CPU) -mthumb -Wall -O0 -g -std=gnu99 -MMD -MP $(INC_FLAGS) $(DEFINES_FLAGS)
+LDFLAGS       := -mcpu=$(CPU) -mthumb -nostdlib -T $(LSCRIPT) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map
 
 $(BUILD_DIR)/$(TARGET): $(OBJS)
 	$(CC) $(OBJS) $(LDFLAGS) -o $@.elf
@@ -23,6 +27,10 @@ $(BUILD_DIR)/$(TARGET): $(OBJS)
 	$(SIZE) $@.elf
 
 $(BUILD_DIR)/%.c.o: %.c
+	mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/%.s.o: %.s
 	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
